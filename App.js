@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, TextInput, StyleSheet, Button,  Alert, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TextInput, StyleSheet, Button,  Alert, Dimensions, TouchableOpacity, TouchableOpacityBase } from 'react-native';
 
 const screenWidth = Dimensions.get("window").width;
 export default class App extends Component {
@@ -20,29 +20,34 @@ export default class App extends Component {
   }
 
   handleToPT = () => {
-    const { input1, input2, input3, input4, x, x1, x2, SNT } = this.state;
-    let a, b, c , d;
-      a = parseInt(input1)
-      b = parseInt(input2)
-      c = parseInt(input3)
-      d = parseInt(input4)
-    this.setState({ visible: true})
-    if ( a != NaN && b != NaN && c != NaN ){
-      let delta, kq1, kq2, cc
-        delta = b*b - 4*a*c;
-      if(delta > 0) {
-        kq1 = (-b - Math.Sqrt(delta)) / 2 * a;
-        kq2 = (-b + Math.Sqrt(delta)) / 2 * a;
+    const { input1, input2, input3, input4, x, x1, x2, SNT,err } = this.state;
+    let a, b, c , d,  delta, kq1, kq2, cc;
+      a = parseInt(input1);
+      b = parseInt(input2);
+      c = parseInt(input3);
+    this.setState({ visible: true});
+			delta = Math.pow(b,2) - (4*a*c);
+		if(delta > 0) {
+			kq1 = (-b - Math.sqrt(delta)) / 2 * a;
+			kq2 = (-b + Math.sqrt(delta)) / 2 * a;
+			const value = 'x1 = ' + kq1 + 'và' + 'x2 = ' + kq2;
+			return Alert.alert('Kết quả',value);
+		}
+		else if (delta == 0) {
+			cc = -b / 2 * a;
+			return Alert.alert('Kết quả', 'x = ' + cc);
+		}
+		else {
+			this.setState({ err: 'Vo Nghiem' });
+      return Alert.alert('Thông báo' , err );
+		}
+  }
 
-        this.setState({ x1: kq1, x2: kq2})
-      }
-      else if (delta == 0) {
-        cc = -b / 2 * a;
-        this.setState({ x: cc });
-      }
-      else this.setState({ err: 'Vo Nghiem' });
-    }
-    else if (d != NaN ){
+  handleSNT = () => {
+    const { input4,SNT } = this.state;
+    let d, count=0;
+    d = parseInt(input4);
+    if (d != NaN ){
       for(var n = 1 ; n <= d; n++){
         let check = true;
         if (n < 2){
@@ -58,32 +63,16 @@ export default class App extends Component {
         }
 
         if (check) {
-          index = SNT.findIndex(item => item == n);
+         let index = SNT.findIndex(item => item == n);
           if(index == -1){
             SNT.push(n);
             this.setState({ SNT });
           }
         }
       }
+      return Alert.alert('Kết quả', 'các số nguyên tố là: ' + SNT );
     }
-    else this.setState({ err: "Loi CMNR "})
-    this.handleRender();
   }
-
-  handleRender = () => {
-    const { err, SNT, x, x1, x2, visible } = this.state;
-    this.setState({ input1: '', input2: '', input3: '', input4: '' })
-    const value = 'x1 = ' + x1 + 'và x2 = ' + x2;
-
-    if (err != '') {
-      return Alert.alert('Thông báo' , err );
-      } else if ( x != '' || x1 != '' && x2 != '') {
-        return Alert.alert('Kết quả' ,  (x != '' ? x : value) );
-      } else {
-        return Alert.alert('Kết quả' + SNT );
-      }
-  }
-
 
   render() {
     const { input1, input2, input3, input4 } = this.state;
@@ -132,12 +121,15 @@ export default class App extends Component {
         </View>
         <View>
           <Button
-            style={{ width: screenWidth*2/5, alignItems: "center", padding: 10, backgroundColor: '#5488c7' }}
+            style={{width: screenWidth*2/5, alignItems: "center", padding: 10, backgroundColor: '#5488c7' }}
             onPress={() => this.handleToPT()}
-            title="Kết quả"
+            title="Kết quả phương trình"
             color="#841584"
             accessibilityLabel="Learn more about this purple button"
           />
+					 <TouchableOpacity style={{marginTop:20,alignItems:"center"}} onPress={() => this.handleSNT()}>
+						 <Text style={{padding:10,backgroundColor:"purple",color:"white"}}>KQ SNT</Text>
+					 </TouchableOpacity>
       </View>
       </ScrollView>
     );    
